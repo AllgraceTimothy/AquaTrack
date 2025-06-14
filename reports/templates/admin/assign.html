@@ -1,0 +1,572 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="admin-container">
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Assign <span>Report #{{ report.id }}</span></h1>
+      <p class="subtitle">Assign this water leak report to a team member</p>
+    </div>
+  </div>
+
+  <div class="assignment-content">
+    <div class="report-card">
+      <div class="report-preview">
+        <div class="preview-image">
+          <img src="{{ report.image.url }}" alt="Leak photo" data-fullsize="{{ report.image.url }}">
+          <div class="view-fullscreen">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="preview-details">
+          <div class="detail-section">
+            <h3>Report Details</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <span class="detail-label">Reporter:</span>
+                <span class="detail-value">{{ report.reporter.username }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Email:</span>
+                <span class="detail-value">{{ report.reporter.email|default:"N/A" }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Status:</span>
+                <span class="status-badge status-{{ report.status }}">
+                  {{ report.get_status_display }}
+                </span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date Reported:</span>
+                <span class="detail-value">{{ report.created_at|date:"M d, Y H:i" }}</span>
+              </div>
+              {% if report.latitude and report.longitude %}
+              <div class="detail-item">
+                <span class="detail-label">Location:</span>
+                <a href="https://www.google.com/maps?q={{ report.latitude }},{{ report.longitude }}" target="_blank" class="map-link">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M3.1 11.2a.5.5 0 0 1 .4-.2H6a.5.5 0 0 1 0 1H3.75L1.5 15h13l-2.25-3H10a.5.5 0 0 1 0-1h2.5a.5.5 0 0 1 .4.2l3 4a.5.5 0 0 1-.4.8H.5a.5.5 0 0 1-.4-.8l3-4z"/>
+                    <path fill-rule="evenodd" d="M8 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z"/>
+                  </svg>
+                  View on Map
+                </a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <div class="description-section">
+            <h3>Description</h3>
+            <div class="description-content">
+              {{ report.description|linebreaksbr }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <form method="post" class="assignment-form">
+      {% csrf_token %}
+      
+      <div class="form-section">
+        <h3>Assignment Details</h3>
+        
+        <div class="form-group">
+          <label for="assigned_to" class="form-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#64ffda" viewBox="0 0 16 16">
+              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+              <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+            </svg>
+            Assign to Team Member
+          </label>
+          <select name="assigned_to" id="assigned_to" class="form-select">
+            {% for user in team_members %}
+              <option value="{{ user.id }}">{{ user.username }} ({{ user.email }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="priority" class="form-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#64ffda" viewBox="0 0 16 16">
+              <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+              <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+            </svg>
+            Priority Level
+          </label>
+          <select name="priority" id="priority" class="form-select">
+            <option value="low">Low Priority</option>
+            <option value="medium" selected>Medium Priority</option>
+            <option value="high">High Priority</option>
+            <option value="critical">Critical</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="notes" class="form-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="#64ffda" viewBox="0 0 16 16">
+              <path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5z"/>
+              <path d="M8 7.993c1.664-1.711 5.825 1.283 0 5.132-5.825-3.85-1.664-6.843 0-5.132z"/>
+            </svg>
+            Additional Notes (Optional)
+          </label>
+          <textarea name="notes" id="notes" class="form-textarea" rows="3" placeholder="Add any special instructions for the assigned team member..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="{% url 'admin-dashboard' %}" class="action-button cancel-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M14.5 1.5a.5.5 0 0 1 .5.5v12a.5.5 0 0 1-1 0V2a.5.5 0 0 1 .5-.5z"/>
+            <path fill-rule="evenodd" d="M1.5 1.5a.5.5 0 0 0-.5.5v12a.5.5 0 0 0 1 0V2a.5.5 0 0 0-.5-.5z"/>
+            <path fill-rule="evenodd" d="M8.146 4.646a.5.5 0 0 1 .708 0l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L11.793 9l-3.147-3.146a.5.5 0 0 1 0-.708z"/>
+            <path fill-rule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+          </svg>
+          Cancel
+        </a>
+        <button type="submit" class="action-button assign-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H1s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C9.516 10.68 8.289 10 6 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+            <path fill-rule="evenodd" d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z"/>
+          </svg>
+          Assign Report
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal" id="image-modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <img id="modal-image" src="" alt="Full size leak image">
+  </div>
+</div>
+
+<style>
+  /* Admin Container */
+  .admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: var(--white);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+  
+  /* Dashboard Header */
+  .dashboard-header {
+    margin-bottom: 2.5rem;
+  }
+  
+  .header-content h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    font-weight: 700;
+  }
+  
+  .header-content h1 span {
+    color: var(--primary-blue);
+    position: relative;
+  }
+  
+  .header-content h1 span::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--light-blue));
+  }
+  
+  .subtitle {
+    color: var(--gray);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+  }
+  
+  /* Assignment Content */
+  .assignment-content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  @media (min-width: 992px) {
+    .assignment-content {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  /* Report Card */
+  .report-card {
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    overflow: hidden;
+    transition: var(--transition);
+  }
+  
+  .report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(100, 255, 218, 0.1);
+  }
+  
+  /* Report Preview */
+  .report-preview {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .preview-image {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+  }
+  
+  .preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .view-fullscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .preview-image:hover .view-fullscreen {
+    opacity: 1;
+  }
+  
+  .preview-image:hover img {
+    transform: scale(1.05);
+  }
+  
+  .preview-details {
+    padding: 1.5rem;
+  }
+  
+  .detail-section, .description-section {
+    margin-bottom: 1.5rem;
+  }
+  
+  .detail-section h3, .description-section h3 {
+    color: var(--primary-blue);
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+    padding-bottom: 0.5rem;
+  }
+  
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .detail-item {
+    margin-bottom: 0.5rem;
+  }
+  
+  .detail-label {
+    font-weight: 500;
+    color: var(--gray);
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .detail-value {
+    color: var(--white);
+    font-size: 1rem;
+  }
+  
+  .description-content {
+    background-color: rgba(100, 255, 218, 0.05);
+    border-radius: 6px;
+    padding: 1rem;
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    line-height: 1.6;
+  }
+  
+  /* Map Link */
+  .map-link {
+    color: var(--primary-blue);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .map-link:hover {
+    text-decoration: underline;
+  }
+  
+  /* Status Badge */
+  .status-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .status-pending {
+    background-color: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+  }
+  
+  .status-in_progress {
+    background-color: rgba(254, 202, 87, 0.1);
+    color: #feca57;
+    border: 1px solid #feca57;
+  }
+  
+  .status-resolved {
+    background-color: rgba(29, 209, 161, 0.1);
+    color: #1dd1a1;
+    border: 1px solid #1dd1a1;
+  }
+  
+  /* Assignment Form */
+  .assignment-form {
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    align-self: flex-start;
+    position: sticky;
+    top: 20px;
+  }
+  
+  .form-section {
+    margin-bottom: 2rem;
+  }
+  
+  .form-section h3 {
+    color: var(--primary-blue);
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+    padding-bottom: 0.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .form-label svg {
+    flex-shrink: 0;
+  }
+  
+  .form-select, .form-textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(100, 255, 218, 0.2);
+    border-radius: 6px;
+    color: var(--white);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .form-textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .form-select:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.2);
+  }
+  
+  /* Form Actions */
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  /* Action Buttons */
+  .action-button {
+    padding: 0.8rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .cancel-button {
+    background-color: transparent;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+  }
+  
+  .cancel-button:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+  
+  .assign-button {
+    background-color: var(--primary-blue);
+    color: var(--darker-bg);
+    border: 1px solid var(--primary-blue);
+  }
+  
+  .assign-button:hover {
+    background-color: rgba(100, 255, 218, 0.8);
+  }
+  
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+  }
+  
+  .modal-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  
+  .close-modal {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .close-modal:hover {
+    color: var(--primary-blue);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .admin-container {
+      padding: 1.5rem;
+    }
+    
+    .header-content h1 {
+      font-size: 2rem;
+    }
+    
+    .detail-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+    }
+    
+    .action-button {
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .admin-container {
+      padding: 1rem;
+    }
+    
+    .header-content h1 {
+      font-size: 1.8rem;
+    }
+    
+    .preview-details {
+      padding: 1rem;
+    }
+  }
+</style>
+
+<script>
+  // Image modal functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // Open modal when clicking on image preview
+    document.querySelectorAll('.view-fullscreen').forEach(button => {
+      button.addEventListener('click', function() {
+        const imgSrc = this.parentElement.querySelector('img').getAttribute('data-fullsize');
+        document.getElementById('modal-image').src = imgSrc;
+        document.getElementById('image-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    
+    // Close modal
+    document.querySelector('.close-modal').addEventListener('click', function() {
+      document.getElementById('image-modal').style.display = 'none';
+      document.body.style.overflow = '';
+    });
+    
+    // Close modal when clicking outside image
+    document.getElementById('image-modal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+  });
+</script>
+{% endblock %}

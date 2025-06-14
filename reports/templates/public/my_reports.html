@@ -1,0 +1,647 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="user-reports-container">
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>My <span>Leak Reports</span></h1>
+      <p class="subtitle">Track the status of your submitted water leak reports</p>
+    </div>
+    <div class="header-actions">
+      <a href="{% url 'submit-leak' %}" class="new-report-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+        New Report
+      </a>
+    </div>
+  </div>
+
+  {% if reports %}
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-value">{{ reports.count }}</div>
+        <div class="stat-label">Total Reports</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-value">{{ pending_count }}</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-value">{{ in_progress_count }}</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13V2a6 6 0 1 1 0 12z"/>
+          <path d="M8 4.75a.5.5 0 0 1 .5.5v3.5a.5.5 0 0 1-.5.5H5a.5.5 0 0 1 0-1h2.5V5.25a.5.5 0 0 1 .5-.5z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="stat-content">
+        <div class="stat-value">{{ resolved_count }}</div>
+        <div class="stat-label">Resolved</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="reports-grid">
+    {% for report in reports %}
+    <div class="report-card status-{{ report.status }}">
+      <div class="card-header">
+        <div class="report-id">Report #{{ report.id }}</div>
+        <div class="status-badge status-{{ report.status }}">
+          {{ report.get_status_display }}
+        </div>
+      </div>
+      
+      <div class="report-image-container">
+        <img src="{{ report.image.url }}" alt="Leak photo" class="report-image" data-fullsize="{{ report.image.url }}">
+        <div class="view-fullscreen">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/>
+          </svg>
+        </div>
+      </div>
+      
+      <div class="report-content">
+        <div class="report-meta">
+          <div class="meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
+            </svg>
+            <span>{{ report.created_at|date:"M d, Y H:i" }}</span>
+          </div>
+          <div class="meta-item">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path fill-rule="evenodd" d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+            </svg>
+            <span>
+              {% if report.latitude and report.longitude %}
+                {{ report.latitude|floatformat:4 }}, {{ report.longitude|floatformat:4 }}
+              {% else %}
+                Location not specified
+              {% endif %}
+            </span>
+          </div>
+        </div>
+        
+        <div class="report-description">
+          <h3>Description</h3>
+          <p>{{ report.description|truncatechars:150 }}</p>
+        </div>
+        
+        <div class="report-actions">
+          <a href="#" class="action-button details-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+              <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+            </svg>
+            View Details
+          </a>
+          {% if report.status != "resolved" %}
+          <a href="#" class="action-button edit-button">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+            </svg>
+            Edit
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="var(--primary-blue)" viewBox="0 0 16 16">
+        <path d="M7.938 2.016A.13.13 0 0 1 8.002 2a.13.13 0 0 1 .063.016.146.146 0 0 1 .054.057l6.857 11.667c.036.06.035.124.002.183a.163.163 0 0 1-.054.06.116.116 0 0 1-.066.017H1.146a.115.115 0 0 1-.066-.017.163.163 0 0 1-.054-.06.176.176 0 0 1 .002-.183L7.884 2.073a.147.147 0 0 1 .054-.057zm1.044-.45a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566z"/>
+        <path d="M7.002 12a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 5.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995z"/>
+      </svg>
+    </div>
+    <h2>No Reports Submitted Yet</h2>
+    <p>You haven't reported any water leaks yet. Be the first to report a leak in your area!</p>
+    <a href="{% url 'submit-leak' %}" class="primary-button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+      </svg>
+      Report a Leak
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- Image Modal -->
+<div class="modal" id="image-modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <img id="modal-image" src="" alt="Full size leak image">
+  </div>
+</div>
+
+<style>
+  /* User Reports Container */
+  .user-reports-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: var(--white);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+  
+  /* Dashboard Header */
+  .dashboard-header {
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .header-content h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    font-weight: 700;
+  }
+  
+  .header-content h1 span {
+    color: var(--primary-blue);
+    position: relative;
+  }
+  
+  .header-content h1 span::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--light-blue));
+  }
+  
+  .subtitle {
+    color: var(--gray);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+  }
+  
+  /* Header Actions */
+  .new-report-button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-blue);
+    color: var(--dark-bg);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    font-weight: 500;
+  }
+  
+  .new-report-button:hover {
+    background-color: rgba(100, 255, 218, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(100, 255, 218, 0.2);
+  }
+  
+  /* Dashboard Stats */
+  .dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .stat-card {
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    transition: var(--transition);
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(100, 255, 218, 0.1);
+  }
+  
+  .stat-card.highlight {
+    border-color: var(--primary-blue);
+    background-color: rgba(100, 255, 218, 0.05);
+  }
+  
+  .stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.25rem;
+    line-height: 1;
+  }
+  
+  .stat-label {
+    color: var(--gray);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .stat-icon svg {
+    opacity: 0.7;
+  }
+  
+  /* Reports Grid */
+  .reports-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+  
+  /* Report Card */
+  .report-card {
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    overflow: hidden;
+    transition: var(--transition);
+  }
+  
+  .report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(100, 255, 218, 0.1);
+  }
+  
+  /* Card Header */
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: rgba(100, 255, 218, 0.05);
+    border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+  }
+  
+  .report-id {
+    font-weight: 600;
+    color: var(--primary-blue);
+  }
+  
+  /* Status Badge */
+  .status-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .status-pending {
+    background-color: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+  }
+  
+  .status-in_progress {
+    background-color: rgba(254, 202, 87, 0.1);
+    color: #feca57;
+    border: 1px solid #feca57;
+  }
+  
+  .status-resolved {
+    background-color: rgba(29, 209, 161, 0.1);
+    color: #1dd1a1;
+    border: 1px solid #1dd1a1;
+  }
+  
+  /* Report Image */
+  .report-image-container {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .report-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .report-card:hover .report-image {
+    transform: scale(1.05);
+  }
+  
+  .view-fullscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .report-image-container:hover .view-fullscreen {
+    opacity: 1;
+  }
+  
+  /* Report Content */
+  .report-content {
+    padding: 1.5rem;
+  }
+  
+  /* Report Meta */
+  .report-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gray);
+    font-size: 0.9rem;
+  }
+  
+  /* Report Description */
+  .report-description h3 {
+    color: var(--white);
+    margin-top: 0;
+    margin-bottom: 0.8rem;
+    font-size: 1.1rem;
+  }
+  
+  .report-description p {
+    margin: 0;
+    color: var(--gray);
+    line-height: 1.6;
+  }
+  
+  /* Report Actions */
+  .report-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  
+  .action-button {
+    padding: 0.6rem 1rem;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    font-weight: 500;
+  }
+  
+  .details-button {
+    background-color: rgba(100, 255, 218, 0.1);
+    color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+  }
+  
+  .details-button:hover {
+    background-color: var(--primary-blue);
+    color: var(--white);
+  }
+  
+  .edit-button {
+    background-color: transparent;
+    color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+  }
+  
+  .edit-button:hover {
+    background-color: rgba(100, 255, 218, 0.1);
+  }
+  
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    border: 1px dashed rgba(100, 255, 218, 0.3);
+  }
+  
+  .empty-icon {
+    margin-bottom: 1.5rem;
+  }
+  
+  .empty-icon svg {
+    opacity: 0.7;
+  }
+  
+  .empty-state h2 {
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-state p {
+    color: var(--gray);
+    margin-bottom: 1.5rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .primary-button {
+    padding: 0.8rem 1.5rem;
+    background-color: var(--primary-blue);
+    color: var(--dark-bg);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+  }
+  
+  .primary-button:hover {
+    background-color: rgba(100, 255, 218, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(100, 255, 218, 0.2);
+  }
+  
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+  }
+  
+  .modal-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  
+  .close-modal {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .close-modal:hover {
+    color: var(--primary-blue);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    .user-reports-container {
+      padding: 1.5rem;
+    }
+    
+    .dashboard-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .header-content h1 {
+      font-size: 2rem;
+    }
+    
+    .dashboard-stats {
+      grid-template-columns: 1fr;
+    }
+    
+    .reports-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .report-actions {
+      flex-direction: column;
+    }
+    
+    .action-button {
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .user-reports-container {
+      padding: 1rem;
+    }
+    
+    .header-content h1 {
+      font-size: 1.8rem;
+    }
+    
+    .empty-state {
+      padding: 3rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  // Image modal functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // Open modal when clicking on image preview
+    document.querySelectorAll('.view-fullscreen').forEach(button => {
+      button.addEventListener('click', function() {
+        const imgSrc = this.parentElement.querySelector('img').getAttribute('data-fullsize');
+        document.getElementById('modal-image').src = imgSrc;
+        document.getElementById('image-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    
+    // Close modal
+    document.querySelector('.close-modal').addEventListener('click', function() {
+      document.getElementById('image-modal').style.display = 'none';
+      document.body.style.overflow = '';
+    });
+    
+    // Close modal when clicking outside image
+    document.getElementById('image-modal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+    
+    // Add animation to report cards on load
+    const reportCards = document.querySelectorAll('.report-card');
+    reportCards.forEach((card, index) => {
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(20px)';
+      card.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
+      
+      setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+      }, 100);
+    });
+  });
+</script>
+{% endblock %}

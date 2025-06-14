@@ -1,0 +1,690 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="public-dashboard">
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Community <span>Water Watch</span></h1>
+      <p class="subtitle">Monitor and report water leaks in your community</p>
+    </div>
+    <div class="header-actions">
+      <a href="{% url 'submit-leak' %}" class="primary-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+        Report a Leak
+      </a>
+    </div>
+  </div>
+
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-value">{{ active_reports }}</div>
+        <div class="stat-label">Active Reports</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+          <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+        </svg>
+      </div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-value">{{ resolved_reports }}</div>
+        <div class="stat-label">Resolved Issues</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </svg>
+      </div>
+    </div>
+    
+    <div class="stat-card highlight">
+      <div class="stat-content">
+        <div class="stat-value">{{ water_saved|floatformat:1 }}M</div>
+        <div class="stat-label">Gallons Saved</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M8 16a6 6 0 0 0 6-6c0-1.655-1.122-2.904-2.432-4.362C10.254 4.176 8.75 2.503 8 0c0 0-6 5.686-6 10a6 6 0 0 0 6 6ZM6.646 4.646l.708.708c-.29.29-.35.716-.1 1.001a.9.9 0 0 0 1.414.1l.707-.707a1 1 0 0 1 1.414 1.414l-.707.707a.9.9 0 0 0-.1 1.402 1 1 0 0 1-1.003 1.414l-.708-.708a2 2 0 1 0 2.83 2.83l.707-.708a2 2 0 0 0 .2-2.617 2 2 0 0 1 .505-2.94l-.708-.708a3 3 0 0 0-4.243 0 3 3 0 0 0 0 4.243Z"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <div class="quick-actions">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="action-grid">
+        <a href="{% url 'submit-leak' %}" class="action-card">
+          <div class="action-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+            </svg>
+          </div>
+          <h3>Report Leak</h3>
+          <p>Submit a new water leak report with photos and location</p>
+        </a>
+        
+        <a href="{% url 'my-reports' %}" class="action-card">
+          <div class="action-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+              <path d="M3 5.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3 8a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9A.5.5 0 0 1 3 8zm0 2.5a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
+            </svg>
+          </div>
+          <h3>My Reports</h3>
+          <p>View status of your submitted leak reports</p>
+        </a>
+        
+        <div class="action-card">
+          <div class="action-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+            </svg>
+          </div>
+          <h3>Conservation Tips</h3>
+          <ul class="tips-list">
+            <li>Fix dripping taps immediately</li>
+            <li>Report leaks within 24 hours</li>
+            <li>Install water-efficient fixtures</li>
+            <li>Check for hidden leaks regularly</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="recent-activity">
+      <div class="activity-header">
+        <h2 class="section-title">Recent Activity</h2>
+        <a href="#" class="view-all">View All</a>
+      </div>
+      <div class="activity-list">
+        {% for activity in recent_activities %}
+        <div class="activity-item">
+          <div class="activity-icon status-{{ activity.status }}">
+            {% if activity.status == 'new' %}
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+              </svg>
+            {% elif activity.status == 'resolved' %}
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+              </svg>
+            {% else %}
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+              </svg>
+            {% endif %}
+          </div>
+          <div class="activity-content">
+            <p><strong>{{ activity.title }}</strong> {{ activity.description }}</p>
+            <div class="activity-meta">
+              <span class="activity-time">{{ activity.time }}</span>
+              {% if activity.location %}
+              <span class="activity-location">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>
+                </svg>
+                {{ activity.location }}
+              </span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="leak-map-container">
+    <div class="map-header">
+      <h2 class="section-title">Reported Leaks Map</h2>
+      <div class="map-legend">
+        <div class="legend-item"><span class="legend-color new"></span> New</div>
+        <div class="legend-item"><span class="legend-color in-progress"></span> In Progress</div>
+        <div class="legend-item"><span class="legend-color resolved"></span> Resolved</div>
+      </div>
+    </div>
+    <div id="leak-map" class="leak-map"></div>
+  </div>
+</div>
+
+<style>
+  /* Public Dashboard */
+  .public-dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: var(--white);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+  
+  /* Dashboard Header */
+  .dashboard-header {
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .header-content h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    font-weight: 700;
+  }
+  
+  .header-content h1 span {
+    color: var(--primary-blue);
+    position: relative;
+  }
+  
+  .header-content h1 span::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--light-blue));
+  }
+  
+  .subtitle {
+    color: var(--gray);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+  }
+  
+  /* Header Actions */
+  .primary-button {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-blue);
+    color: var(--dark-bg);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    font-weight: 500;
+  }
+  
+  .primary-button:hover {
+    background-color: rgba(100, 255, 218, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(100, 255, 218, 0.2);
+  }
+  
+  /* Dashboard Stats */
+  .dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .stat-card {
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    transition: var(--transition);
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(100, 255, 218, 0.1);
+  }
+  
+  .stat-card.highlight {
+    border-color: var(--primary-blue);
+    background-color: rgba(100, 255, 218, 0.05);
+  }
+  
+  .stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.25rem;
+    line-height: 1;
+  }
+  
+  .stat-label {
+    color: var(--gray);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .stat-icon svg {
+    opacity: 0.7;
+  }
+  
+  /* Dashboard Content */
+  .dashboard-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  @media (max-width: 992px) {
+    .dashboard-content {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Section Titles */
+  .section-title {
+    color: var(--white);
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 0.5rem;
+    font-size: 1.5rem;
+  }
+  
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--primary-blue);
+  }
+  
+  /* Quick Actions */
+  .quick-actions {
+    grid-column: 1;
+  }
+  
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .action-card {
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    transition: var(--transition);
+  }
+  
+  .action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(100, 255, 218, 0.1);
+  }
+  
+  a.action-card {
+    text-decoration: none;
+  }
+  
+  a.action-card:hover {
+    border-color: var(--primary-blue);
+  }
+  
+  .action-icon {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(100, 255, 218, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    color: var(--primary-blue);
+  }
+  
+  .action-card h3 {
+    color: var(--white);
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .action-card p {
+    color: var(--gray);
+    margin-bottom: 0;
+  }
+  
+  .tips-list {
+    padding-left: 1.2rem;
+    margin: 0;
+    color: var(--gray);
+  }
+  
+  .tips-list li {
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Recent Activity */
+  .recent-activity {
+    grid-column: 2;
+  }
+  
+  @media (max-width: 992px) {
+    .recent-activity {
+      grid-column: 1;
+    }
+  }
+  
+  .activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1rem;
+  }
+  
+  .view-all {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: var(--transition);
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+  
+  .activity-list {
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+  }
+  
+  .activity-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+  }
+  
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+  
+  .activity-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .activity-icon.status-new {
+    background-color: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+  }
+  
+  .activity-icon.status-in_progress {
+    background-color: rgba(254, 202, 87, 0.1);
+    color: #feca57;
+  }
+  
+  .activity-icon.status-resolved {
+    background-color: rgba(29, 209, 161, 0.1);
+    color: #1dd1a1;
+  }
+  
+  .activity-content {
+    flex-grow: 1;
+  }
+  
+  .activity-content p {
+    margin: 0;
+    color: var(--white);
+    line-height: 1.5;
+  }
+  
+  .activity-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .activity-time {
+    color: var(--gray);
+  }
+  
+  .activity-location {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--primary-blue);
+  }
+  
+  /* Leak Map */
+  .leak-map-container {
+    margin-bottom: 2rem;
+  }
+  
+  .map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+  }
+  
+  .map-legend {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--gray);
+  }
+  
+  .legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+  
+  .legend-color.new {
+    background-color: #ff6b6b;
+  }
+  
+  .legend-color.in-progress {
+    background-color: #feca57;
+  }
+  
+  .legend-color.resolved {
+    background-color: #1dd1a1;
+  }
+  
+  .leak-map {
+    height: 500px;
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    overflow: hidden;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    .public-dashboard {
+      padding: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .header-content h1 {
+      font-size: 2rem;
+    }
+    
+    .dashboard-stats {
+      grid-template-columns: 1fr;
+    }
+    
+    .leak-map {
+      height: 400px;
+    }
+    
+    .map-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .map-legend {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .public-dashboard {
+      padding: 1rem;
+    }
+    
+    .header-content h1 {
+      font-size: 1.8rem;
+    }
+    
+    .action-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .leak-map {
+      height: 300px;
+    }
+  }
+</style>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""/>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the map
+    const map = L.map('leak-map').setView([0, 0], 2);
+    
+    // Add tile layer (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 18,
+    }).addTo(map);
+    
+    // In a real implementation, you would add markers from your data
+    // Example markers (replace with your actual data)
+    const leaks = [
+      { lat: 40.7128, lng: -74.0060, status: 'new', title: 'Main Street Leak' },
+      { lat: 34.0522, lng: -118.2437, status: 'in_progress', title: 'Park Avenue Leak' },
+      { lat: 41.8781, lng: -87.6298, status: 'resolved', title: 'Downtown Leak' },
+    ];
+    
+    // Create custom icons
+    const newIcon = L.divIcon({
+      className: 'leak-marker new',
+      html: '💧',
+      iconSize: [30, 30],
+    });
+    
+    const inProgressIcon = L.divIcon({
+      className: 'leak-marker in-progress',
+      html: '💧',
+      iconSize: [30, 30],
+    });
+    
+    const resolvedIcon = L.divIcon({
+      className: 'leak-marker resolved',
+      html: '💧',
+      iconSize: [30, 30],
+    });
+    
+    // Add markers to the map
+    leaks.forEach(leak => {
+      let icon;
+      if (leak.status === 'new') icon = newIcon;
+      else if (leak.status === 'in_progress') icon = inProgressIcon;
+      else icon = resolvedIcon;
+      
+      L.marker([leak.lat, leak.lng], { icon })
+        .addTo(map)
+        .bindPopup(`<b>${leak.title}</b><br>Status: ${leak.status.replace('_', ' ')}`);
+    });
+    
+    // Fit map to markers if there are any
+    if (leaks.length > 0) {
+      const group = new L.featureGroup(leaks.map(leak => L.marker([leak.lat, leak.lng])));
+      map.fitBounds(group.getBounds().pad(0.2));
+    }
+    
+    // Add animation to elements
+    const animateElements = document.querySelectorAll('.stat-card, .action-card, .activity-item');
+    animateElements.forEach((el, index) => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = `opacity 0.5s ease ${index * 0.1}s, transform 0.5s ease ${index * 0.1}s`;
+      
+      setTimeout(() => {
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }, 100);
+    });
+  });
+</script>
+
+<style>
+  /* Leaflet Map Customization */
+  .leak-marker {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    text-shadow: 0 0 3px rgba(0,0,0,0.8);
+  }
+  
+  .leak-marker.new {
+    color: #ff6b6b;
+  }
+  
+  .leak-marker.in-progress {
+    color: #feca57;
+  }
+  
+  .leak-marker.resolved {
+    color: #1dd1a1;
+  }
+  
+  .leaflet-popup-content {
+    color: #333;
+    margin: 8px 12px;
+  }
+  
+  .leaflet-popup-content b {
+    color: var(--primary-blue);
+  }
+</style>
+{% endblock %}

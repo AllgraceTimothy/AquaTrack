@@ -1,0 +1,762 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="admin-dashboard">
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1>Team <span>Dashboard</span></h1>
+      <p class="subtitle">Manage and track all assigned water leak reports</p>
+    </div>
+    
+    <div class="header-actions">
+      <div class="search-filter">
+        <div class="search-box">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="var(--gray)" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+          </svg>
+          <input type="text" placeholder="Search reports..." class="search-input">
+        </div>
+        <select class="status-filter">
+          <option value="all">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="in_progress">In Progress</option>
+          <option value="resolved">Resolved</option>
+        </select>
+      </div>
+      <button class="refresh-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+          <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+        Refresh Data
+      </button>
+    </div>
+  </div>
+
+  <div class="dashboard-stats">
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-value">{{ total_assignments }}</div>
+        <div class="stat-label">Total Reports</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-value">{{ pending_count }}</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-value">{{ in_progress_count }}</div>
+        <div class="stat-label">In Progress</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 13V2a6 6 0 1 1 0 12z"/>
+          <path d="M8 4.75a.5.5 0 0 1 .5.5v3.5a.5.5 0 0 1-.5.5H5a.5.5 0 0 1 0-1h2.5V5.25a.5.5 0 0 1 .5-.5z"/>
+        </svg>
+      </div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="stat-content">
+        <div class="stat-value">{{ resolved_count }}</div>
+        <div class="stat-label">Resolved</div>
+      </div>
+      <div class="stat-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="var(--primary-blue)" viewBox="0 0 16 16">
+          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <div class="reports-table-container">
+      <table class="reports-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Reporter</th>
+            <th>Location</th>
+            <th>Image</th>
+            <th>Status</th>
+            <th>Date Reported</th>
+            <th>Priority</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for assignment in assignments %}
+          <tr class="status-{{ assignment.status }}">
+            <td>#{{ assignment.id }}</td>
+            <td>
+              <div class="user-info">
+                <div class="username">{{ assignment.reporter.username }}</div>
+                <div class="user-email">{{ assignment.reporter.email }}</div>
+              </div>
+            </td>
+            <td>
+              {% if assignment.latitude and assignment.longitude %}
+              <a href="https://www.google.com/maps?q={{ assignment.latitude }},{{ assignment.longitude }}" target="_blank" class="map-link">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path fill-rule="evenodd" d="M3.1 11.2a.5.5 0 0 1 .4-.2H6a.5.5 0 0 1 0 1H3.75L1.5 15h13l-2.25-3H10a.5.5 0 0 1 0-1h2.5a.5.5 0 0 1 .4.2l3 4a.5.5 0 0 1-.4.8H.5a.5.5 0 0 1-.4-.8l3-4z"/>
+                  <path fill-rule="evenodd" d="M8 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z"/>
+                </svg>
+                View Map
+              </a>
+              {% else %}
+              <span class="no-location">N/A</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="image-preview">
+                <img src="{{ assignment.image.url }}" alt="Leak photo" data-fullsize="{{ assignment.image.url }}">
+                <div class="view-fullscreen">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M1.5 1a.5.5 0 0 0-.5.5v4a.5.5 0 0 1-1 0v-4A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4zM10 .5a.5.5 0 0 1 .5-.5h4A1.5 1.5 0 0 1 16 1.5v4a.5.5 0 0 1-1 0v-4a.5.5 0 0 0-.5-.5h-4a.5.5 0 0 1-.5-.5zM.5 10a.5.5 0 0 1 .5.5v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 1 0 1h-4A1.5 1.5 0 0 1 0 14.5v-4a.5.5 0 0 1 .5-.5zm15 0a.5.5 0 0 1 .5.5v4a1.5 1.5 0 0 1-1.5 1.5h-4a.5.5 0 0 1 0-1h4a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 1 .5-.5z"/>
+                  </svg>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="status-badge status-{{ assignment.status }}">
+                {{ assignment.get_status_display }}
+              </span>
+            </td>
+            <td>{{ assignment.created_at|date:"M d, Y H:i" }}</td>
+            <td>
+              <span class="priority-badge priority-{{ assignment.priority|default:'medium' }}">
+                {{ assignment.get_priority_display|default:"Medium" }}
+              </span>
+            </td>
+            <td>
+              <div class="action-buttons">
+                <a href="{% url 'resolve' assignment.id %}" class="action-button resolve-button" {% if assignment.status == "resolved" %}disabled{% endif %}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                  </svg>
+                  Mark as Resolved
+                </a>
+                <a href="#" class="action-button details-button">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                    <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                  </svg>
+                  Details
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Image Modal -->
+  <div class="modal" id="image-modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <img id="modal-image" src="" alt="Full size leak image">
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Admin Dashboard Styles */
+  .admin-dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    color: var(--white);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+  
+  /* Dashboard Header */
+  .dashboard-header {
+    margin-bottom: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .header-content h1 {
+    font-size: 2.5rem;
+    margin: 0;
+    font-weight: 700;
+  }
+  
+  .header-content h1 span {
+    color: var(--primary-blue);
+    position: relative;
+  }
+  
+  .header-content h1 span::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-blue), var(--light-blue));
+  }
+  
+  .subtitle {
+    color: var(--gray);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+  }
+  
+  /* Header Actions */
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .search-filter {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-grow: 1;
+  }
+  
+  .search-box {
+    display: flex;
+    align-items: center;
+    background-color: var(--darker-bg);
+    border: 1px solid rgba(100, 255, 218, 0.2);
+    border-radius: var(--border-radius);
+    padding: 0 1rem;
+    flex-grow: 1;
+  }
+  
+  .search-box svg {
+    margin-right: 0.5rem;
+  }
+  
+  .search-input {
+    padding: 0.75rem 0;
+    background-color: transparent;
+    border: none;
+    color: var(--white);
+    width: 100%;
+    font-size: 1rem;
+  }
+  
+  .search-input:focus {
+    outline: none;
+  }
+  
+  .status-filter {
+    padding: 0.75rem;
+    background-color: var(--darker-bg);
+    border: 1px solid rgba(100, 255, 218, 0.2);
+    border-radius: var(--border-radius);
+    color: var(--white);
+    min-width: 180px;
+    font-size: 1rem;
+  }
+  
+  .refresh-button {
+    padding: 0.75rem 1.5rem;
+    background-color: transparent;
+    border: 1px solid var(--primary-blue);
+    color: var(--primary-blue);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 1rem;
+  }
+  
+  .refresh-button:hover {
+    background-color: rgba(100, 255, 218, 0.1);
+  }
+  
+  /* Dashboard Stats */
+  .dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .stat-card {
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    transition: var(--transition);
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(100, 255, 218, 0.1);
+  }
+  
+  .stat-card.highlight {
+    border-color: var(--primary-blue);
+    background-color: rgba(100, 255, 218, 0.05);
+  }
+  
+  .stat-value {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.25rem;
+    line-height: 1;
+  }
+  
+  .stat-label {
+    color: var(--gray);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .stat-icon svg {
+    opacity: 0.7;
+  }
+  
+  /* Reports Table */
+  .dashboard-content {
+    background-color: var(--darker-bg);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    overflow: hidden;
+  }
+  
+  .reports-table-container {
+    overflow-x: auto;
+  }
+  
+  .reports-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+  }
+  
+  .reports-table th {
+    background-color: rgba(100, 255, 218, 0.1);
+    color: var(--primary-blue);
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    position: sticky;
+    top: 0;
+  }
+  
+  .reports-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+    vertical-align: middle;
+  }
+  
+  .reports-table tr:last-child td {
+    border-bottom: none;
+  }
+  
+  .reports-table tr:hover {
+    background-color: rgba(100, 255, 218, 0.05);
+  }
+  
+  /* Status Badges */
+  .status-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .status-pending {
+    background-color: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+    border: 1px solid #ff6b6b;
+  }
+  
+  .status-in_progress {
+    background-color: rgba(254, 202, 87, 0.1);
+    color: #feca57;
+    border: 1px solid #feca57;
+  }
+  
+  .status-resolved {
+    background-color: rgba(29, 209, 161, 0.1);
+    color: #1dd1a1;
+    border: 1px solid #1dd1a1;
+  }
+  
+  /* Priority Badges */
+  .priority-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .priority-low {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+    border: 1px solid #0d6efd;
+  }
+  
+  .priority-medium {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #ffc107;
+    border: 1px solid #ffc107;
+  }
+  
+  .priority-high {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid #dc3545;
+  }
+  
+  .priority-critical {
+    background-color: rgba(111, 66, 193, 0.1);
+    color: #6f42c1;
+    border: 1px solid #6f42c1;
+  }
+  
+  /* User Info */
+  .user-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .username {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+  
+  .user-email {
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+  
+  /* Image Preview */
+  .image-preview {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .view-fullscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .image-preview:hover .view-fullscreen {
+    opacity: 1;
+  }
+  
+  .image-preview:hover img {
+    transform: scale(1.05);
+  }
+  
+  /* Map Link */
+  .map-link {
+    color: var(--primary-blue);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .map-link:hover {
+    text-decoration: underline;
+  }
+  
+  .no-location {
+    color: var(--gray);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+  
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 0.75rem;
+  }
+  
+  .action-button {
+    padding: 0.6rem 1rem;
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    font-weight: 500;
+  }
+  
+  .resolve-button {
+    background-color: rgba(29, 209, 161, 0.1);
+    color: #1dd1a1;
+    border: 1px solid #1dd1a1;
+  }
+  
+  .resolve-button:hover:not([disabled]) {
+    background-color: #1dd1a1;
+    color: var(--darker-bg);
+  }
+  
+  .resolve-button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .details-button {
+    background-color: rgba(100, 255, 218, 0.1);
+    color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+  }
+  
+  .details-button:hover {
+    background-color: var(--primary-blue);
+    color: var(--white);
+  }
+  
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+  }
+  
+  .modal-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+  
+  .close-modal {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .close-modal:hover {
+    color: var(--primary-blue);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 1200px) {
+    .admin-dashboard {
+      padding: 1.5rem;
+    }
+    
+    .dashboard-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .header-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .search-filter {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .search-box {
+      width: 100%;
+    }
+    
+    .status-filter {
+      width: 100%;
+    }
+    
+    .refresh-button {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .dashboard-stats {
+      grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+    
+    .action-button {
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .admin-dashboard {
+      padding: 1rem;
+    }
+    
+    .header-content h1 {
+      font-size: 2rem;
+    }
+    
+    .reports-table th, 
+    .reports-table td {
+      padding: 1rem;
+    }
+    
+    .stat-value {
+      font-size: 1.8rem;
+    }
+  }
+</style>
+
+<script>
+  // Image modal functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    // Open modal when clicking on image preview
+    document.querySelectorAll('.view-fullscreen').forEach(button => {
+      button.addEventListener('click', function() {
+        const imgSrc = this.parentElement.querySelector('img').getAttribute('data-fullsize');
+        document.getElementById('modal-image').src = imgSrc;
+        document.getElementById('image-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+      });
+    });
+    
+    // Close modal
+    document.querySelector('.close-modal').addEventListener('click', function() {
+      document.getElementById('image-modal').style.display = 'none';
+      document.body.style.overflow = '';
+    });
+    
+    // Close modal when clicking outside image
+    document.getElementById('image-modal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    });
+    
+    // Status filter functionality
+    document.querySelector('.status-filter').addEventListener('change', function() {
+      const status = this.value;
+      const rows = document.querySelectorAll('.reports-table tbody tr');
+      
+      rows.forEach(row => {
+        if (status === 'all' || row.classList.contains(`status-${status}`)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+    
+    // Search functionality
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.reports-table tbody tr');
+        
+        rows.forEach(row => {
+          const rowText = row.textContent.toLowerCase();
+          if (rowText.includes(searchTerm)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    // Refresh button functionality
+    document.querySelector('.refresh-button').addEventListener('click', function() {
+      window.location.reload();
+    });
+    
+    // Add animation to table rows on load
+    const tableRows = document.querySelectorAll('.reports-table tbody tr');
+    tableRows.forEach((row, index) => {
+      row.style.opacity = '0';
+      row.style.transform = 'translateY(20px)';
+      row.style.transition = `opacity 0.5s ease ${index * 0.05}s, transform 0.5s ease ${index * 0.05}s`;
+      
+      setTimeout(() => {
+        row.style.opacity = '1';
+        row.style.transform = 'translateY(0)';
+      }, 100);
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,780 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="hero-section">
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">Aqua<span>Track</span></h1>
+        <h2 class="hero-subtitle">Your City's Water Guardian</h2>
+        <p class="hero-description">Report. Track. Resolve. Powered by AI for a leak-free community.</p>
+        
+        {% if not user.is_authenticated %}
+        <div class="hero-actions">
+          <a href="{% url 'register' %}" class="btn btn-primary">
+            <span>Join Now</span>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"></path>
+            </svg>
+          </a>
+          <a href="{% url 'login' %}" class="btn btn-secondary">
+            <span>Log in</span>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+        {% else %}
+          {% if user.user_type == 'public' %}
+          <div class="hero-actions">
+            <a href="{% url 'submit-leak' %}" class="btn btn-primary">
+              <span>Report a Leak</span>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2v4M4.93 4.93l2.83 2.83M2 12h4M4.93 19.07l2.83-2.83M12 22v-4M19.07 4.93l-2.83 2.83M22 12h-4M19.07 19.07l-2.83-2.83"></path>
+              </svg>
+            </a>
+            <a href="{% url 'my-reports' %}" class="btn btn-secondary">
+              <span>View My Reports</span>
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3h18v18H3z"></path>
+                <path d="M3 9h18M9 9v12"></path>
+              </svg>
+            </a>
+          </div>
+          {% endif %}
+        {% endif %}
+      </div>
+      
+      <div class="hero-visual">
+        <div class="water-drop-animation">
+          <div class="drop" style="--delay: 0s;"></div>
+          <div class="drop" style="--delay: 0.5s;"></div>
+          <div class="drop" style="--delay: 1s;"></div>
+          <div class="ripple"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="features-section">
+  <div class="container">
+    <h2 class="section-title">Why AquaTrack?</h2>
+    <p class="section-subtitle">Empowering communities to protect our most precious resource</p>
+    
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 17H13V21H17V17Z"></path>
+            <path d="M17 13H13V17H17V13Z"></path>
+            <path d="M12 12H8V16H12V12Z"></path>
+            <path d="M7 7H3V11H7V7Z"></path>
+            <path d="M17 7H13V11H17V7Z"></path>
+            <path d="M7 12H3V16H7V12Z"></path>
+          </svg>
+        </div>
+        <h3>Real-time Reporting</h3>
+        <p>Instantly report water leaks with our easy-to-use platform, helping utilities respond faster.</p>
+        <a href="#" class="feature-link">
+          Learn more
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 3v18h18"></path>
+            <path d="M18 17V9"></path>
+            <path d="M13 17V5"></path>
+            <path d="M8 17v-3"></path>
+          </svg>
+        </div>
+        <h3>AI-Powered Analysis</h3>
+        <p>Our advanced algorithms prioritize reports based on severity and potential impact.</p>
+        <a href="#" class="feature-link">
+          Learn more
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+      
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+          </svg>
+        </div>
+        <h3>Transparent Tracking</h3>
+        <p>Follow your report's progress from submission to resolution with full visibility.</p>
+        <a href="#" class="feature-link">
+          Learn more
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12h14M12 5l7 7-7 7"></path>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number" id="leaks-reported">0</div>
+        <div class="stat-label">Leaks Reported</div>
+        <div class="stat-description">By community members like you</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="problems-solved">0</div>
+        <div class="stat-label">Problems Solved</div>
+        <div class="stat-description">Through our efficient response system</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number" id="water-saved">0</div>
+        <div class="stat-label">Gallons Saved</div>
+        <div class="stat-description">Conserving our precious water resources</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cta-section">
+  <div class="container">
+    <div class="cta-content">
+      <h2>Ready to make a difference?</h2>
+      <p>Join thousands of community members protecting our water infrastructure</p>
+      <div class="cta-actions">
+        {% if not user.is_authenticated %}
+          <a href="{% url 'register' %}" class="btn btn-primary">Sign Up Free</a>
+          <a href="{% url 'about' %}" class="btn btn-outline">Learn How It Works</a>
+        {% else %}
+          <a href="{% url 'submit-leak' %}" class="btn btn-primary">Report a Leak Now</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Base Styles */
+  .container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+  
+  /* Hero Section */
+  .hero-section {
+    background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%);
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="rgba(100, 255, 218, 0.03)" d="M0,0 L100,0 L100,100 Q50,80 0,100"></path></svg>');
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    background-position: bottom center;
+    opacity: 0.8;
+  }
+  
+  .hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    position: relative;
+    z-index: 2;
+    padding: 30px;
+  }
+  
+  @media (min-width: 992px) {
+    .hero-content {
+      flex-direction: row;
+      gap: 4rem;
+    }
+  }
+  
+  .hero-text {
+    flex: 1;
+    max-width: 600px;
+  }
+  
+  .hero-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin: 0 0 1rem 0;
+    background: linear-gradient(to right, var(--primary-blue), var(--light-blue));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    line-height: 1.1;
+    font-weight: 800;
+  }
+  
+  .hero-title span {
+    font-weight: 800;
+  }
+  
+  .hero-subtitle {
+    font-size: clamp(1.25rem, 2vw, 1.75rem);
+    color: var(--light-gray);
+    margin: 0 0 1.5rem 0;
+    font-weight: 400;
+  }
+  
+  .hero-description {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    color: var(--white);
+    opacity: 0.9;
+    max-width: 500px;
+  }
+  
+  .hero-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .btn {
+    padding: 0.9rem 1.75rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .btn svg {
+    transition: var(--transition);
+  }
+  
+  .btn-primary {
+    background-color: var(--primary-blue);
+    color: var(--darker-bg);
+    box-shadow: 0 4px 14px rgba(100, 255, 218, 0.3);
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--primary-blue-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(100, 255, 218, 0.4);
+  }
+  
+  .btn-primary:hover svg {
+    transform: translateX(3px);
+  }
+  
+  .btn-secondary {
+    background-color: transparent;
+    color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+  }
+  
+  .btn-secondary:hover {
+    background-color: rgba(100, 255, 218, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .btn-secondary:hover svg {
+    transform: rotate(45deg);
+  }
+  
+  .btn-outline {
+    background-color: transparent;
+    color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+  }
+  
+  .btn-outline:hover {
+    background-color: rgba(100, 255, 218, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  /* Water Drop Animation */
+  .hero-visual {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    position: relative;
+    max-width: 500px;
+    width: 100%;
+  }
+  
+  .water-drop-animation {
+    position: relative;
+    width: 100%;
+    height: 300px;
+  }
+  
+  .drop {
+    position: absolute;
+    top: 0;
+    width: 16px;
+    height: 16px;
+    background: var(--primary-blue);
+    border-radius: 50%;
+    opacity: 0.7;
+    animation: drop 2s linear infinite;
+    animation-delay: var(--delay);
+    left: 50%;
+    transform: translateX(-50%);
+    filter: drop-shadow(0 0 5px rgba(100, 255, 218, 0.5));
+  }
+  
+  .ripple {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--primary-blue);
+    border-radius: 50%;
+    opacity: 0;
+    animation: ripple 2s linear infinite;
+  }
+  
+  @keyframes drop {
+    0% {
+      top: 0;
+      opacity: 0.7;
+    }
+    80% {
+      opacity: 0.7;
+    }
+    100% {
+      top: 100px;
+      opacity: 0;
+    }
+  }
+  
+  @keyframes ripple {
+    0% {
+      width: 20px;
+      height: 20px;
+      opacity: 0.7;
+    }
+    100% {
+      width: 120px;
+      height: 120px;
+      opacity: 0;
+    }
+  }
+  
+  /* Features Section */
+  .features-section {
+    padding: 6rem 0;
+    background-color: rgba(10, 25, 47, 0.7);
+    position: relative;
+  }
+  
+  .features-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="rgba(100, 255, 218, 0.03)" d="M0,100 L100,0 L100,100 Q50,80 0,100"></path></svg>');
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    background-position: top center;
+    opacity: 0.5;
+    z-index: -1;
+  }
+  
+  .section-title {
+    text-align: center;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    margin-bottom: 1rem;
+    color: var(--primary-blue);
+    position: relative;
+    font-weight: 700;
+  }
+  
+  .section-subtitle {
+    text-align: center;
+    color: var(--gray);
+    max-width: 700px;
+    margin: 0 auto 3rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  
+  .section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: var(--primary-blue);
+  }
+  
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  @media (min-width: 768px) {
+    .features-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  .feature-card {
+    background-color: var(--darker-bg);
+    padding: 2.5rem 2rem;
+    border-radius: 8px;
+    transition: var(--transition);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+  
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(100, 255, 218, 0.05) 0%, transparent 100%);
+    z-index: -1;
+    opacity: 0;
+    transition: var(--transition);
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 30px rgba(2, 12, 27, 0.5);
+    border-color: rgba(100, 255, 218, 0.3);
+  }
+  
+  .feature-card:hover::before {
+    opacity: 1;
+  }
+  
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(100, 255, 218, 0.1);
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+  }
+  
+  .feature-icon svg {
+    width: 30px;
+    height: 30px;
+    stroke: var(--primary-blue);
+  }
+  
+  .feature-card h3 {
+    color: var(--primary-blue);
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+  }
+  
+  .feature-card p {
+    color: var(--gray);
+    margin: 0 0 1.5rem;
+    line-height: 1.7;
+  }
+  
+  .feature-link {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    transition: var(--transition);
+  }
+  
+  .feature-link svg {
+    transition: var(--transition);
+  }
+  
+  .feature-link:hover {
+    color: var(--light-blue);
+  }
+  
+  .feature-link:hover svg {
+    transform: translateX(3px);
+  }
+  
+  /* Stats Section */
+  .stats-section {
+    padding: 5rem 0;
+    background-color: var(--darker-bg);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .stats-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="rgba(100, 255, 218, 0.03)" d="M0,0 L100,0 L100,100 Q50,80 0,100"></path></svg>');
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+    background-position: bottom center;
+    opacity: 0.5;
+  }
+  
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    text-align: center;
+  }
+  
+  @media (min-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  .stat-item {
+    position: relative;
+    padding: 2rem 1rem;
+  }
+  
+  .stat-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 1px;
+    background: rgba(100, 255, 218, 0.2);
+  }
+  
+  @media (min-width: 768px) {
+    .stat-item:not(:last-child)::after {
+      bottom: 50%;
+      right: 0;
+      left: auto;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 100px;
+    }
+  }
+  
+  .stat-number {
+    font-size: clamp(2.5rem, 5vw, 3.5rem);
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+    line-height: 1;
+  }
+  
+  .stat-label {
+    color: var(--light-gray);
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .stat-description {
+    color: var(--gray);
+    font-size: 0.9rem;
+    max-width: 250px;
+    margin: 0 auto;
+  }
+  
+  /* CTA Section */
+  .cta-section {
+    padding: 5rem 0;
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+    color: var(--darker-bg);
+    text-align: center;
+  }
+  
+  .cta-content h2 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    margin-bottom: 1rem;
+    font-weight: 700;
+  }
+  
+  .cta-content p {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    opacity: 0.9;
+  }
+  
+  .cta-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .cta-section .btn-primary {
+    background-color: var(--darker-bg);
+    color: var(--primary-blue);
+    box-shadow: 0 4px 14px rgba(2, 12, 27, 0.3);
+  }
+  
+  .cta-section .btn-primary:hover {
+    background-color: rgba(2, 12, 27, 0.9);
+  }
+  
+  .cta-section .btn-outline {
+    background-color: transparent;
+    color: var(--darker-bg);
+    border: 1px solid var(--darker-bg);
+  }
+  
+  .cta-section .btn-outline:hover {
+    background-color: rgba(2, 12, 27, 0.1);
+  }
+  
+  /* Responsive Adjustments */
+  @media (max-width: 768px) {
+    .hero-section {
+      padding: 3rem 0;
+    }
+    
+    .hero-content {
+      text-align: center;
+    }
+    
+    .hero-description {
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .hero-actions {
+      justify-content: center;
+    }
+    
+    .features-section {
+      padding: 4rem 0;
+    }
+    
+    .feature-card {
+      padding: 2rem 1.5rem;
+    }
+    
+    .stats-section {
+      padding: 3rem 0;
+    }
+    
+    .cta-section {
+      padding: 3rem 0;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .hero-title {
+      font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.25rem;
+    }
+    
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .feature-card {
+      padding: 1.5rem 1rem;
+    }
+  }
+</style>
+
+<script>
+  // Animated counter for statistics
+  document.addEventListener('DOMContentLoaded', function() {
+    const animateValue = (id, start, end, duration) => {
+      const obj = document.getElementById(id);
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const value = Math.floor(progress * (end - start) + start);
+        
+        // Format numbers with commas
+        if (id === 'water-saved') {
+          obj.innerHTML = value.toLocaleString();
+        } else {
+          obj.innerHTML = value;
+        }
+        
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    };
+    
+    // Only animate when stats are in viewport
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateValue("leaks-reported", 0, 1243, 2000);
+          animateValue("problems-solved", 0, 987, 2000);
+          animateValue("water-saved", 0, 5240000, 2000);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    
+    const statsSection = document.querySelector('.stats-section');
+    if (statsSection) {
+      observer.observe(statsSection);
+    }
+    
+    // Water drop animation - create additional drops dynamically
+    const waterDropContainer = document.querySelector('.water-drop-animation');
+    if (waterDropContainer) {
+      for (let i = 0; i < 3; i++) {
+        const drop = document.createElement('div');
+        drop.className = 'drop';
+        drop.style.setProperty('--delay', `${1.5 + i * 0.5}s`);
+        waterDropContainer.appendChild(drop);
+      }
+    }
+  });
+</script>
+{% endblock %}
